@@ -12,10 +12,11 @@ using System;
 using System.Net;
 using Assets.Scripts;
 using BepInEx.Logging;
+using System.Reflection;
 
 namespace IC10E__Direct_Reference_Extension
 {
-    [BepInPlugin("net.lawofsynergy.stationeers.ic10e.dre", "[IC10E] Direct Reference Extensions", "0.0.1.0")]
+    [BepInPlugin("net.lawofsynergy.stationeers.ic10e.dre", "[IC10E] Direct Reference Extensions", "0.0.2.0")]
     [BepInDependency("net.lawofsynergy.stationeers.ic10e")]
     public class Plugin : BaseUnityPlugin
     {
@@ -112,7 +113,6 @@ namespace IC10E__Direct_Reference_Extension
                 })
                 .Select(grouping =>
                 {
-                    Plugin.Logger.LogInfo($"Transforming group: {grouping.Key}");
                     long[] group = new long[groupingDef.Length];
                     for (int i = 0; i < groupingDef.Length; i++)
                     {

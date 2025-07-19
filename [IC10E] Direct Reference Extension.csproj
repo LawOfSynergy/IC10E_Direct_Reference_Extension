@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\More IC10 Commands\IC10 Extender.csproj" />
+		<PackageReference Include="ic10extender" Version="1.0.1" />
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(GameDir)\rocketstation_Data\Managed\Assembly-CSharp.dll</HintPath>
 		</Reference>
@@ -28,8 +28,4 @@
 			<HintPath>$(GameDir)\rocketstation_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
 		</Reference>
 	</ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /Y /F &quot;$(TargetPath)&quot; &quot;$(GameDir)\BepInEx\plugins&quot;" />
-	</Target>
 </Project>

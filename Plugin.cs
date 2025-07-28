@@ -16,7 +16,7 @@ using System.Reflection;
 
 namespace IC10E__Direct_Reference_Extension
 {
-    [BepInPlugin("net.lawofsynergy.stationeers.ic10e.dre", "[IC10E] Direct Reference Extensions", "0.0.2.0")]
+    [BepInPlugin("net.lawofsynergy.stationeers.ic10e.dre", "[IC10E] Direct Reference Extensions", "0.0.4.0")]
     [BepInDependency("net.lawofsynergy.stationeers.ic10e")]
     public class Plugin : BaseUnityPlugin
     {
@@ -49,25 +49,6 @@ namespace IC10E__Direct_Reference_Extension
 
     public static class Utils
     {
-        public static HelpString[] Varargs(HelpString[] core, HelpString vararg, int currentArgCount)
-        {
-            if (currentArgCount < core.Length)
-            {
-                return core;
-            }
-            var result = new HelpString[currentArgCount + 1];
-            int i = 0;
-            foreach (var arg in core)
-            {
-                result[i++] = arg;
-            }
-            for (; i < result.Length; i++)
-            {
-                result[i++] = vararg;
-            }
-            return result;
-        }
-
         public static void LoadToStack(IMemoryWritable writeable, IEnumerable<long> refIds, int start)
         {
             var count = refIds.Count();
@@ -274,9 +255,14 @@ namespace IC10E__Direct_Reference_Extension
             return new LSDInstance(chip, lineNumber, source[1], source[2], source[3], source[4]);
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
             return Args;
+        }
+
+        public override string Description()
+        {
+            return "Functions identically to <color=yellow>ls</color>, with the exception of taking a device's <color=orange>ReferenceId</color> instead of a device pin.";
         }
 
         public class LSDInstance : Operation
@@ -323,9 +309,14 @@ namespace IC10E__Direct_Reference_Extension
             return new SSDInstance(chip, lineNumber, source[1], source[2], source[3], source[4]);
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
             return Args;
+        }
+
+        public override string Description()
+        {
+            return "Functions identically to <color=yellow>ss</color>, with the exception of taking a device's <color=orange>ReferenceId</color> instead of a device pin.";
         }
 
         public class SSDInstance : Operation
@@ -383,9 +374,15 @@ namespace IC10E__Direct_Reference_Extension
             return new Instance(chip, lineNumber, source[1], source[2], source[3]);
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
             return Args;
+        }
+
+        public override string Description()
+        {
+            return "Gets the <color=orange>ReferenceId</color> of all devices with a matching <color=orange>PrefabHash</color>, then <color=yellow>put</color>s the " +
+                "count of these addresses into the target device's stack at startAddress followed by each refId on subsequent stack addresses.";
         }
 
         public class Instance : DeviceBatchStackOperation
@@ -443,9 +440,15 @@ namespace IC10E__Direct_Reference_Extension
             return new Instance(chip, lineNumber, source[1], source[2], source[3], source[4]);
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
             return Args;
+        }
+
+        public override string Description()
+        {
+            return "Gets the <color=orange>ReferenceId</color> of all devices with a matching <color=orange>PrefabHash</color> and <color=orange>NameHash</color>, then <color=yellow>put</color>s the " +
+                "count of these addresses into the target device's stack at startAddress followed by each refId on subsequent stack addresses.";
         }
 
         public class Instance : PutDevicesInBatch.Instance
@@ -500,9 +503,14 @@ namespace IC10E__Direct_Reference_Extension
             return new Instance(chip, lineNumber, source[1], source[2], source[3]);
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
             return Args;
+        }
+
+        public override string Description()
+        {
+            return "Functions identically to <color=yellow>putb</color>, except the target device whose stack is modified is referenced by <color=orange>ReferenceId</color> instead of device pin.";
         }
 
         public class Instance : DirectBatchStackOperation
@@ -557,9 +565,14 @@ namespace IC10E__Direct_Reference_Extension
             return new Instance(chip, lineNumber, source[1], source[2], source[3], source[4]);
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
             return Args;
+        }
+
+        public override string Description()
+        {
+            return "Functions identically to <color=yellow>putbn</color>, except the target device whose stack is modified is referenced by <color=orange>ReferenceId</color> instead of device pin.";
         }
 
         public class Instance : PutDirectlyDevicesInBatch.Instance
@@ -611,9 +624,31 @@ namespace IC10E__Direct_Reference_Extension
             return new Instance(chip, lineNumber, source[1], source[2], source.Skip(3));
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
-            return Utils.Varargs(RequiredArgs, VarArg, currentArgCount);
+            return RequiredArgs;
+        }
+
+        public override HelpString? VarArgParam()
+        {
+            return VarArg;
+        }
+
+        public override string Description()
+        {
+            return "Loads the <color=orange>ReferenceId</color>s of groups of devices that share the same name, and formats them into an array on the target device's stack." +
+                "\n\nThis array is formatted with the count of groups at startAddress, followed by the reference of each device, ordered by the order of the prefab hashes passed to this command." +
+                "\n\nGroups are only inlcuded in this array when exactly 1 device matches each prefabHash passed to this command. Devices sharing the same name, but whose hash is not included in the list are ignored." +
+                "\n\nExample (with made up hashes): putgbn db 5 12 16" +
+                "\n    Pressure Regulator prefabHash=16 refId=10 name=\"Fill Station 1\"" +
+                "\n    Gas Tank Storage prefabHash=12 refId=11 name=\"Fill Station 1\"" +
+                "\n    Pipe Heater prefabHash=14 refId=12 name=\"Fill Station 1\"" +
+                "\n\n    Pressure Regulator prefabHash=16 refId=13 name=\"Fill Station 2\"" +
+                "\n    Pressure Regulator prefabHash=16 refId=14 name=\"Fill Station 2\"" +
+                "\n    Gas Tank Storage prefabHash=12 refId=15 name=\"Fill Station 2\"" +
+                "\n\n    Gas Tank Storage prefabHash=12 refId=16 name=\"Fill Station 3\"" +
+                "\n\nyields the following array:" +
+                "\n5: 1\n6: 11\n7: 10";
         }
 
         public class Instance : DeviceBatchStackOperation
@@ -671,9 +706,19 @@ namespace IC10E__Direct_Reference_Extension
             return new Instance(chip, lineNumber, source[1], source[2], source.Skip(3).ToArray());
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
-            return Utils.Varargs(RequiredArgs, VarArg, currentArgCount);
+            return RequiredArgs;
+        }
+
+        public override HelpString? VarArgParam()
+        {
+            return VarArg;
+        }
+
+        public override string Description()
+        {
+            return "Functions identically to <color=yellow>putgbn</color>, except the target device whose stack is modified is referenced by <color=orange>ReferenceId</color> instead of device pin.";
         }
 
         public class Instance : DirectBatchStackOperation
@@ -729,9 +774,14 @@ namespace IC10E__Direct_Reference_Extension
             return new Instance(chip, lineNumber, source[1], source[2], source[3]);
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
             return Args;
+        }
+
+        public override string Description()
+        {
+            return "Set all indexes on the device stack between startIndex (inclusive) and startIndex + count (inclusive) to 0.";
         }
 
         public class Instance : ClearRangeOperation
@@ -772,9 +822,14 @@ namespace IC10E__Direct_Reference_Extension
             return new Instance(chip, lineNumber, source[1], source[2], source[3]);
         }
 
-        public override HelpString[] Params(int currentArgCount)
+        public override HelpString[] Params()
         {
             return Args;
+        }
+
+        public override string Description()
+        {
+            return "Functions identically to <color=yellow>clrr</color>, except the target device whose stack is modified is referenced by <color=orange>ReferenceId</color> instead of device pin.";
         }
 
         public class Instance : ClearRangeOperation

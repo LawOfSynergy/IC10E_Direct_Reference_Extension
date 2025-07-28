@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ic10extender" Version="1.0.1" />
+		<ProjectReference Include="..\IC10Extender\IC10Extender.csproj" />
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(GameDir)\rocketstation_Data\Managed\Assembly-CSharp.dll</HintPath>
 		</Reference>
